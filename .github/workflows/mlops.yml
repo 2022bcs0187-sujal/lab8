@@ -41,14 +41,9 @@ jobs:
           echo "Checking files..."
           ls -la
 
-          if [ -f metrics.txt ]; then
-            IFS=',' read DATASET RMSE R2 < metrics.txt
-          else
-            echo "metrics.txt not found"
-            DATASET="N/A"
-            RMSE="N/A"
-            R2="N/A"
-          fi
+          DATASET=$(cut -d',' -f1 metrics.txt)
+          RMSE=$(cut -d',' -f2 metrics.txt)
+          R2=$(cut -d',' -f3 metrics.txt)
 
           echo "## ML Pipeline Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
