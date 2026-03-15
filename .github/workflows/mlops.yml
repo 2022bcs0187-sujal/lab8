@@ -2,38 +2,53 @@ name: ML Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-
   train:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
 
-    - name: Checkout Repo
-      uses: actions/checkout@v3
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
 
-    - name: Install Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.11
+      - name: Install Dependencies
+        run: |
+          pip install dvc
+          pip install dvc-s3
+          pip install pandas scikit-learn
 
-    - name: Install Dependencies
-      run: |
-        pip install dvc
-        pip install dvc-s3
-        pip install pandas scikit-learn
+      - name: Configure AWS
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws configure set aws_session_token ${{ secrets.AWS_SESSION_TOKEN }}
+          aws configure set region ${{ secrets.AWS_REGION }}
 
-    - name: Configure AWS
-      run: |
-        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws configure set aws_session_token ${{ secrets.AWS_SESSION_TOKEN }}
-        aws configure set region ${{ secrets.AWS_REGION }}
+      - name: Pull Dataset
+        run: dvc pull
 
-    - name: Pull Dataset
-      run: dvc pull
+      - name: Train Model
+        run: python src/train.py
 
-    - name: Train Model
-      run: python src/train.py
+      - name: Generate Summary
+        run: |
+          IFS=',' read DATASET RMSE R2 < metrics.txt
+
+          echo "## ML Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Roll No:** 2022bcs0187" >> $GITHUB_STEP_SUMMARY
+          echo "**Name:** Sujal Chodvadiya" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### Results" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Dataset Size | $DATASET |" >> $GITHUB_STEP_SUMMARY
+          echo "| RMSE | $RMSE |" >> $GITHUB_STEP_SUMMARY
+          echo "| R² | $R2 |" >> $GITHUB_STEP_SUMMARY

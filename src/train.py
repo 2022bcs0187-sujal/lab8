@@ -31,7 +31,11 @@ predictions = model.predict(X_test)
 # Metrics
 rmse = mean_squared_error(y_test, predictions) ** 0.5
 r2 = r2_score(y_test, predictions)
+dataset_size = len(df)
 
-print("Dataset size:", len(df))
+print("Dataset size:", dataset_size)
 print("RMSE:", rmse)
 print("R2:", r2)
+
+with open("metrics.txt", "w") as f:
+    f.write(f"{dataset_size},{rmse},{r2}")
