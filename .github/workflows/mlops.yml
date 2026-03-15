@@ -36,19 +36,19 @@ jobs:
       - name: Train Model
         run: python src/train.py
 
-      - name: Generate Summary
+      - name: Generate GitHub Summary
         run: |
           IFS=',' read DATASET RMSE R2 < metrics.txt
 
           echo "## ML Pipeline Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Roll No:** 2022bcs0187" >> $GITHUB_STEP_SUMMARY
           echo "**Name:** Sujal Chodvadiya" >> $GITHUB_STEP_SUMMARY
+          echo "**Roll No:** 2022BCS0187" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          echo "### Results" >> $GITHUB_STEP_SUMMARY
+          echo "### Model Metrics" >> $GITHUB_STEP_SUMMARY
           echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|------|------|" >> $GITHUB_STEP_SUMMARY
           echo "| Dataset Size | $DATASET |" >> $GITHUB_STEP_SUMMARY
           echo "| RMSE | $RMSE |" >> $GITHUB_STEP_SUMMARY
-          echo "| R² | $R2 |" >> $GITHUB_STEP_SUMMARY
+          echo "| R² Score | $R2 |" >> $GITHUB_STEP_SUMMARY
